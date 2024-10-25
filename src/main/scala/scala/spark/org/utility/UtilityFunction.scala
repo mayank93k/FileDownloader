@@ -2,10 +2,45 @@ package scala.spark.org.utility
 
 import java.io.{BufferedInputStream, FileOutputStream}
 import java.net.URL
+import scala.io.Source
 import scala.spark.org.common.logger.Logging
+import scala.util.matching.Regex
 import scala.util.{Failure, Success, Try}
 
 object UtilityFunction extends Logging {
+  /**
+   * Method to scrape files from a URL and download them.
+   *
+   * @param url         : The URL from which to scrape files.
+   * @param downloadDir : The local directory to save downloaded files.
+   */
+  def scrapeAndDownloadFiles(url: String, downloadDir: String): Unit = {
+    logger.info("Started processing scrapes and download file method.")
+    Try {
+      // Fetch the HTML content from the URL
+      val content = Source.fromURL(url)
+
+      // Define a regex pattern to find file links (adjust if necessary)
+      val fileLinkPattern: Regex = """href="([^"]*?\.(zip|csv|txt))"""".r
+
+      // Extract file URLs and download each one
+      val fileUrls = fileLinkPattern.findAllMatchIn(content.mkString).map { m =>
+        val relativeUrl = m.group(1)
+        // Create absolute URL for the file
+        if (relativeUrl.startsWith("http")) relativeUrl else s"$url$relativeUrl"
+      }
+
+      // Download each file found
+      fileUrls.foreach { fileUrl =>
+        logger.info(s"Attempting to download: $fileUrl")
+        downloadFile(fileUrl, downloadDir)
+      }
+    } match {
+      case Success(_) => logger.info(s"Files scraped and downloaded from $url")
+      case Failure(ex) => logger.error(s"An error occurred while scraping $url: ${ex.getMessage}")
+    }
+  }
+
   /**
    * This method to download a file from a given URL to a specific directory
    *
