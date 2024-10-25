@@ -74,4 +74,33 @@ object UtilityFunction extends Logging {
     }
     logger.info("Finished processing downloading file method.")
   }
+
+  /**
+   * Method to find the most recent date directory from a base URL.
+   *
+   * @param baseUrl : The base URL to search for date directories.
+   * @return The most recent date directory if found; otherwise, None.
+   */
+  def findMostRecentDate(baseUrl: String): Option[String] = {
+    logger.info("Started processing find the most recent date methods.")
+    Try {
+      val content = Source.fromURL(baseUrl)
+      val datePattern: Regex = """href="(\d{4}-\d{2}/)"""".r
+
+      // Extract and sort date directories
+      val dates = datePattern.findAllMatchIn(content.mkString)
+        .map(_.group(1).stripSuffix("/"))
+        .toList
+        .sorted(Ordering[String].reverse)
+
+      dates.headOption
+    } match {
+      case Success(date) =>
+        logger.info(s"Most recent date found from path: $date")
+        date
+      case Failure(ex) =>
+        logger.error(s"Failed to find any date directories: ${ex.getMessage}")
+        None
+    }
+  }
 }
