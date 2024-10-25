@@ -3,6 +3,7 @@ package scala.spark.org.utility
 import java.io.{BufferedInputStream, FileOutputStream}
 import java.net.URL
 import scala.io.Source
+import scala.spark.org.common.constant.ApplicationConstant._
 import scala.spark.org.common.logger.Logging
 import scala.util.matching.Regex
 import scala.util.{Failure, Success, Try}
@@ -21,7 +22,7 @@ object UtilityFunction extends Logging {
       val content = Source.fromURL(url)
 
       // Define a regex pattern to find file links (adjust if necessary)
-      val fileLinkPattern: Regex = """href="([^"]*?\.(zip|csv|txt))"""".r
+      val fileLinkPattern: Regex = FileLinkPattern.r
 
       // Extract file URLs and download each one
       val fileUrls = fileLinkPattern.findAllMatchIn(content.mkString).map { m =>
@@ -85,7 +86,7 @@ object UtilityFunction extends Logging {
     logger.info("Started processing find the most recent date methods.")
     Try {
       val content = Source.fromURL(baseUrl)
-      val datePattern: Regex = """href="(\d{4}-\d{2}/)"""".r
+      val datePattern: Regex = DatePattern.r
 
       // Extract and sort date directories
       val dates = datePattern.findAllMatchIn(content.mkString)
