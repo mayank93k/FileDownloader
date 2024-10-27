@@ -1,4 +1,4 @@
-name := "Project_Spark_Scala"
+name := "ZIP File Downloader"
 
 version := "0.1"
 
