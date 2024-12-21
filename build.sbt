@@ -1,4 +1,4 @@
-name := "ZIP File Downloader"
+name := "File Downloader"
 
 version := "0.1"
 
